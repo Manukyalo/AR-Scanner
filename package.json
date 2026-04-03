@@ -34,8 +34,5 @@
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
     "vite": "^8.0.1"
-  },
-  "optionalDependencies": {
-    "mind-ar": "^1.2.5"
   }
 }
