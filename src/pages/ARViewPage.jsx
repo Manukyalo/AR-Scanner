@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import * as MINDAR from 'mind-ar/dist/mindar-image-three.prod.js';
+import * as THREE from 'three';
 
 export default function ARViewPage() {
   const { restaurantId, dishId } = useParams();

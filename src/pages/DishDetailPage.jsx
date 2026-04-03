@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
+import DishModelViewer from '../components/DishModelViewer';
 
 export default function DishDetailPage() {
   const { restaurantId, dishId } = useParams();
@@ -94,6 +95,12 @@ export default function DishDetailPage() {
               ))}
             </div>
           </div>
+
+          {/* 3D Model Viewer Section */}
+          <DishModelViewer 
+            modelUrl={dish.modelUrl} 
+            fallbackImage={dish.thumbnailUrl} 
+          />
 
           <div className="space-y-4 pt-4">
             <button 

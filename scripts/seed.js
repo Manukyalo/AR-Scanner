@@ -1,5 +1,28 @@
-import { db } from '../src/firebase/config.js';
-import { collection, doc, setDoc } from 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Manual .env loading for Node.js environment
+const envPath = join(process.cwd(), '.env');
+const envContent = readFileSync(envPath, 'utf8');
+const env = {};
+envContent.split('\n').forEach(line => {
+  const [key, value] = line.split('=');
+  if (key && value) env[key.trim()] = value.trim();
+});
+
+const firebaseConfig = {
+  apiKey: env.VITE_FIREBASE_API_KEY,
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: env.VITE_FIREBASE_APP_ID
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const seedData = async () => {
   const restaurantId = 'test-restaurant';
@@ -28,7 +51,7 @@ const seedData = async () => {
       isVeg: false,
       ingredients: ['Wagyu Beef', 'Truffle Mayo', 'Caramelized Onion', 'Brioche Bun'],
       thumbnailUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=400',
-      modelUrl: '/models/burger.glb'
+      modelUrl: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/burger/model.gltf'
     },
     {
       id: 'pasta',
