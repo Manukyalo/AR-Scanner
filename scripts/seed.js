@@ -42,40 +42,76 @@ const seedData = async () => {
   // 2. Seed Dishes with Detailed Metadata
   const dishes = [
     {
-      id: 'burger',
-      name: 'Premium Wagyu Burger',
-      price: 24,
-      category: 'Burgers',
-      description: 'Aged Wagyu beef patty, served with a perfect balance of savory truffle and sweet onion jam on a toasted brioche bun.',
-      calories: 850,
+      id: 'caviar',
+      name: 'Osetra Caviar Service',
+      price: 150,
+      category: 'Appetizers',
+      description: 'Royal Osetra Caviar served on a hand-carved ice block, accompanied by traditional blinis, organic crème fraîche, and a mother-of-pearl spoon.',
+      calories: 220,
       isVeg: false,
-      ingredients: ['Wagyu Beef', 'Truffle Mayo', 'Caramelized Onion', 'Brioche Bun'],
-      thumbnailUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=400',
-      modelUrl: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/burger/model.gltf'
+      ingredients: ['Osetra Caviar', 'Buckwheat Blinis', 'Chives', 'Crème Fraîche'],
+      thumbnailUrl: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=600',
+      modelUrl: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/pearl/model.gltf'
     },
     {
-      id: 'pasta',
-      name: 'Truffle Tagliatelle',
-      price: 32,
+      id: 'gold-steak',
+      name: '24K Gold Tomahawk',
+      price: 850,
       category: 'Mains',
-      description: 'Silky, hand-made tagliatelle pasta tossed in an exquisite, creamy black truffle sauce.',
-      calories: 640,
-      isVeg: true,
-      ingredients: ['Fresh Tagliatelle', 'Black Truffle', 'Pecorino Romano'],
-      thumbnailUrl: 'https://images.unsplash.com/photo-1473093226795-af9932fe5856?auto=format&fit=crop&q=80&w=400',
-      modelUrl: '/models/pasta.glb'
+      description: 'Dry-aged Wagyu Tomahawk steak, leafed in 24-karat edible gold. Carved tableside for an unparalleled sensory experience.',
+      calories: 1450,
+      isVeg: false,
+      ingredients: ['Aged Wagyu', '24K Gold Leaf', 'Truffle Salt', 'Bone Marrow'],
+      thumbnailUrl: 'https://images.unsplash.com/photo-1546241072-48010ad28c2c?auto=format&fit=crop&q=80&w=600',
+      modelUrl: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/steak/model.gltf'
     },
     {
-      id: 'salad',
-      name: 'Mediterranean Quinoa',
-      price: 18,
-      category: 'Salads',
-      description: 'Zesty quinoa with fresh cucumbers, cherry tomatoes, and kalamata olives.',
-      calories: 320,
+      id: 'tuna-tartare',
+      name: 'Blue Fin Otoro Tartare',
+      price: 55,
+      category: 'Appetizers',
+      description: 'Premium Blue Fin fatty tuna hand-chopped with Asian pear, fresh wasabi, and a drizzle of 25-year-aged balsamic.',
+      calories: 380,
+      isVeg: false,
+      ingredients: ['Blue Fin Tuna', 'Asian Pear', 'Yuzu Poke Sauce', 'Black Sesame'],
+      thumbnailUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600',
+      modelUrl: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/wooden-bowl-with-food/model.gltf'
+    },
+    {
+      id: 'lobster-risotto',
+      name: 'Saffron Lobster Risotto',
+      price: 72,
+      category: 'Mains',
+      description: 'Acquerello rice infused with pure Persian saffron, topped with butter-poached Maine lobster and edible flowers.',
+      calories: 580,
+      isVeg: false,
+      ingredients: ['Maine Lobster', 'Saffron', 'Carnaroli Rice', 'Sea Buckthorn'],
+      thumbnailUrl: 'https://images.unsplash.com/photo-1534080391025-097d4c80710d?auto=format&fit=crop&q=80&w=600',
+      modelUrl: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/shrimp/model.gltf'
+    },
+    {
+      id: 'black-truffle-macaron',
+      name: 'Diamond Truffle Macaron',
+      price: 45,
+      category: 'Desserts',
+      description: 'Large-scale macaron filled with dark chocolate ganache and shavings of fresh Italian Perigord black truffle.',
+      calories: 310,
       isVeg: true,
-      ingredients: ['Quinoa', 'Cucumber', 'Cherry Tomatoes', 'Feta Cheese'],
-      thumbnailUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400',
-      modelUrl: '/models/salad.glb'
+      ingredients: ['Dark Chocolate', 'Black Truffle', 'Gold Dust', 'Almond Flour'],
+      thumbnailUrl: 'https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&q=80&w=600',
+      modelUrl: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/cookie/model.gltf'
+    },
+    {
+      id: 'vintage-champagne',
+      name: 'Vintage Dom Pérignon',
+      price: 1200,
+      category: 'Beverages',
+      description: 'The pinnacle of luxury. A full-bodied vintage champagne with notes of stone fruit and toasted brioche.',
+      calories: 450,
+      isVeg: true,
+      ingredients: ['Chardonnay', 'Pinot Noir', 'Time'],
+      thumbnailUrl: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=600',
+      modelUrl: 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/champagne-glass/model.gltf'
     }
   ];
 

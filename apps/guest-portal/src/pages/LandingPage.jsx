@@ -88,7 +88,7 @@ export default function LandingPage() {
           className="mt-24 w-full max-w-sm"
         >
           <button
-            onClick={() => navigate('/menu/pronto-restaurant')}
+            onClick={() => navigate('/menu/test-restaurant')}
             className="group relative w-full h-24 bg-white text-black rounded-[32px] font-black uppercase tracking-[0.2em] text-xs hover:bg-slate-200 transition-all active:scale-[0.98] shadow-2xl overflow-hidden"
           >
              <div className="relative z-10 flex items-center justify-center gap-4">
