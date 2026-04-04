@@ -1,0 +1,7 @@
+{
+  "buildCommand": "npm run build:guest",
+  "outputDirectory": "apps/guest-portal/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
