@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #8b5cf6;
+  --color-brand-secondary: #ec4899;
+  --font-outfit: "Outfit", sans-serif;
+  --font-playfair: "Playfair Display", serif;
+}
+
+@layer base {
+  body {
+    @apply bg-black text-slate-50 antialiased overflow-x-hidden;
+    font-family: var(--font-outfit);
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[40px] shadow-2xl;
+  }
+  
+  .luxury-button {
+    @apply relative h-20 bg-white text-black px-10 rounded-3xl font-black uppercase tracking-[0.2em] text-[11px] 
+           hover:bg-slate-200 transition-all active:scale-[0.98] shadow-2xl shadow-white/5 overflow-hidden flex items-center justify-center;
+  }
+}
+
+/* Custom scrollbar for premium look */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+/* Animations */
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+}
+
+/* No-scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

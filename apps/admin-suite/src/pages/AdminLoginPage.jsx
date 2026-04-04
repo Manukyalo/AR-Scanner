@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { auth } from '@shared/firebase/config';
 import { motion } from 'framer-motion';
 import { Lock, Mail, ChevronRight, AlertCircle, Loader2 } from 'lucide-react';
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { db } from '../firebase/config';
+import { db } from '@shared/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import DishModelViewer from '../components/DishModelViewer';
 

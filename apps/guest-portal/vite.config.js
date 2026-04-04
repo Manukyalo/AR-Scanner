@@ -4,7 +4,6 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     tailwindcss(),
@@ -13,11 +12,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons.svg'],
       manifest: {
-        name: 'AR Scanner Premium',
-        short_name: 'AR Scanner',
-        description: 'Immersive food scanning experience',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        name: 'Luxury AR Menu | Guest',
+        short_name: 'Luxury Menu',
+        description: 'Immersive food scanning experience for premium dining.',
+        theme_color: '#000000',
+        background_color: '#000000',
         display: 'standalone',
         icons: [
           {
@@ -29,13 +28,14 @@ export default defineConfig({
         ]
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024 // 10MB to cover three.js/models
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024
       }
     })
   ],
   resolve: {
-    alias: [
-      { find: /^three$/, replacement: path.resolve('./src/three-shim.js') }
-    ]
+    alias: {
+      '@shared': path.resolve(__dirname, '../../shared'),
+      'three': path.resolve(__dirname, '../../src/three-shim.js') // Temporary fallback until shim is moved
+    }
   }
 });
