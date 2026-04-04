@@ -13,6 +13,9 @@ export default function ARViewPage() {
   const [error, setError] = useState(null);
   const modelViewerRef = useRef(null);
 
+  const [progress, setProgress] = useState(0);
+  const [modelLoaded, setModelLoaded] = useState(false);
+
   useEffect(() => {
     async function fetchDish() {
       try {
@@ -26,17 +29,9 @@ export default function ARViewPage() {
           if (dishDoc.exists()) dishData = { id: dishDoc.id, ...dishDoc.data() };
         }
 
-        if (dishData) {
-          setDish(dishData);
-        } else {
-          setError("Celestial object not found.");
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Quantum link failure.");
-      } finally {
-        setIsLoading(false);
-      }
+        if (dishData) setDish(dishData);
+        else setError("Celestial object not found.");
+      } catch (err) { setError("Quantum link failure."); } finally { setIsLoading(false); }
     }
     fetchDish();
   }, [restaurantId, dishId]);
@@ -56,28 +51,26 @@ export default function ARViewPage() {
         <model-viewer
           ref={modelViewerRef}
           src={dish.modelUrl}
-          ios-src={dish.iosModelUrl || ''} // Fallback for iOS QuickLook
+          ios-src={dish.iosModelUrl || ''} 
           alt={dish.name}
           ar
           ar-modes="webxr scene-viewer quick-look"
+          ar-placement="floor"
           camera-controls
           auto-rotate
-          shadow-intensity="1"
+          shadow-intensity="1.5"
+          shadow-softness="1"
+          exposure="1.2"
           environment-image="neutral"
-          exposure="1"
           interaction-prompt="auto"
+          onProgress={(e) => setProgress(Math.floor(e.detail.totalProgress * 100))}
+          onLoad={() => setModelLoaded(true)}
           style={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}
           className="absolute inset-0 z-0"
         >
-          {/* Holographic Hotspots for Ingredients */}
-          {dish.ingredients?.map((ing, i) => (
-             <button
-               key={i}
-               slot={`hotspot-ing-${i}`}
-               data-position={getIngredientPosition(i)}
-               data-normal="0 1 0"
-               className="group relative flex items-center justify-center"
-             >
+          {/* Holographic Hotspots */}
+          {modelLoaded && dish.ingredients?.map((ing, i) => (
+             <button key={i} slot={`hotspot-ing-${i}`} data-position={getIngredientPosition(i)} data-normal="0 1 0" className="group relative flex items-center justify-center">
                 <div className="w-4 h-4 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.8)] animate-pulse" />
                 <div className="absolute left-6 whitespace-nowrap bg-black/60 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{ing}</span>
@@ -88,11 +81,21 @@ export default function ARViewPage() {
           {/* Custom AR Button */}
           <button 
             slot="ar-button" 
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 bg-white text-black px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl flex items-center gap-3 z-50 active:scale-95 transition-all"
+            className="absolute bottom-12 left-1/2 -translate-x-1/2 bg-white text-black px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl flex items-center gap-3 z-50 active:scale-95 transition-all outline-none border-none ring-offset-4 ring-white/20 hover:ring-2"
           >
             <Scan size={18} />
             Place on Table
           </button>
+
+          {/* Model Loading HUD */}
+          {!modelLoaded && (
+             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md z-40">
+                <div className="w-16 h-1 w-32 bg-white/5 rounded-full overflow-hidden mb-4">
+                   <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} className="h-full bg-white shadow-[0_0_15px_white]" />
+                </div>
+                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40">Atmospheric Materialization {progress}%</span>
+             </div>
+          )}
         </model-viewer>
       )}
 
@@ -120,12 +123,12 @@ export default function ARViewPage() {
       </div>
 
       {/* 3. Bottom Spatial Metadata */}
-      {!isLoading && dish && (
+      {dish && modelLoaded && (
         <div className="absolute bottom-32 inset-x-0 px-8 flex flex-col items-center pointer-events-none z-10">
            <motion.div 
              initial={{ y: 50, opacity: 0 }}
              animate={{ y: 0, opacity: 1 }}
-             className="w-full max-w-sm bg-black/30 backdrop-blur-[40px] border border-white/10 p-8 rounded-[40px] pointer-events-auto shadow-2xl"
+             className="w-full max-w-sm bg-black/50 backdrop-blur-[60px] border border-white/10 p-8 rounded-[40px] pointer-events-auto shadow-2xl"
            >
               <div className="flex justify-between items-start mb-6">
                  <div>
@@ -142,13 +145,13 @@ export default function ARViewPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                 <div className="bg-white/5 border border-white/5 p-5 rounded-3xl flex flex-col items-center justify-center gap-2">
-                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest leading-none">Scale Status</span>
-                    <span className="text-[10px] font-black text-white uppercase tracking-tighter">1:1 REAL TIME</span>
+                 <div className="bg-white/5 border border-white/5 p-5 rounded-3xl flex flex-col items-center justify-center gap-2 text-center">
+                    <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest leading-none">Perspective</span>
+                    <span className="text-[9px] font-black text-white uppercase tracking-tighter">1:1 SPATIAL</span>
                  </div>
-                 <div className="bg-white/5 border border-white/5 p-5 rounded-3xl flex flex-col items-center justify-center gap-2">
-                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest leading-none">VFX Engine</span>
-                    <span className="text-[10px] font-black text-white uppercase tracking-tighter">PHYSICAL-SHDR</span>
+                 <div className="bg-white/5 border border-white/5 p-5 rounded-3xl flex flex-col items-center justify-center gap-2 text-center">
+                    <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest leading-none">Rendering</span>
+                    <span className="text-[9px] font-black text-white uppercase tracking-tighter">CLEAN-FIDELITY</span>
                  </div>
               </div>
            </motion.div>
