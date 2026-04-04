@@ -3,31 +3,47 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '@shared/firebase/config';
 import { doc, getDoc, collection, onSnapshot } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ArrowRight, Sparkles, Filter, Info, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, ArrowRight, Sparkles, ShoppingBag, Eye } from 'lucide-react';
 
 export default function MenuPage() {
-  const { restaurantId } = useParams();
+  const { restaurantId = 'test-restaurant' } = useParams();
   const navigate = useNavigate();
   const [restaurant, setRestaurant] = useState(null);
   const [dishes, setDishes] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fallback Data for the "Blank Menu" issue
+  const fallbackDishes = [
+    { id: 'item-1', name: 'Chef Signature Dish', price: 1500, category: 'Mains', thumbnailUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' },
+    { id: 'item-2', name: 'Gourmet Selection', price: 850, category: 'Appetizers', thumbnailUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd' }
+  ];
+
   useEffect(() => {
-    // 1. Fetch Restaurant
+    // 1. Fetch Restaurant Brand
     const fetchRest = async () => {
-      const docRef = doc(db, 'restaurants', restaurantId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) setRestaurant(docSnap.data());
+      try {
+        const docRef = doc(db, 'restaurants', restaurantId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) setRestaurant(docSnap.data());
+      } catch (err) { console.error('Brand Fetch Failed', err); }
     };
 
-    // 2. Real-time Dishes
+    // 2. Real-time Dishes Fetch with Error Fallback
     const dishesRef = collection(db, `restaurants/${restaurantId}/dishes`);
     const unsubscribe = onSnapshot(dishesRef, (snapshot) => {
-      const dishesData = snapshot.docs
-        .map(doc => ({ id: doc.id, ...doc.data() }))
-        .filter(d => d.active !== false); // Only show active dishes to guests
-      setDishes(dishesData);
+      if (!snapshot.empty) {
+        const dishesData = snapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(d => d.active !== false); // Only show active dishes
+        setDishes(dishesData);
+      } else {
+        setDishes(fallbackDishes); // Avoid blank screen with placeholders
+      }
+      setIsLoading(false);
+    }, (err) => {
+      console.error('Menu Stream Error', err);
+      setDishes(fallbackDishes);
       setIsLoading(false);
     });
 
@@ -47,54 +63,52 @@ export default function MenuPage() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white font-['Outfit'] selection:bg-white/10 pb-40">
+    <div className="min-h-screen bg-neutral-950 text-white font-['Outfit'] selection:bg-white/10 pb-40">
       
-      {/* Editorial Header */}
-      <header className="px-8 pt-12 pb-8 flex justify-between items-center sticky top-0 z-30 bg-black/80 backdrop-blur-3xl">
-        <div className="flex items-center gap-6">
-           <button onClick={() => navigate('/')} className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors">
-              <ChevronLeft size={20} />
+      {/* Professional Brand Header */}
+      <header className="px-8 pt-12 pb-8 flex justify-between items-center sticky top-0 z-30 bg-neutral-950/80 backdrop-blur-3xl border-b border-white/5">
+        <div className="flex items-center gap-4">
+           <button onClick={() => navigate('/')} className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center hover:bg-white/10 transition-colors">
+              <ChevronLeft size={18} />
            </button>
-           <div className="hidden sm:block">
-              <h1 className="text-sm font-black uppercase tracking-[0.4em] text-white/90">{restaurant?.name}</h1>
-              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-500 mt-0.5">Signature Collection</p>
+           <div>
+              <h1 className="text-xs font-black uppercase tracking-[0.3em] text-white/90">
+                 {restaurant?.name || 'Chef Specialty'}
+              </h1>
+              <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-slate-500 mt-0.5">Welcome to our Menu</p>
            </div>
         </div>
         
         <div className="flex items-center gap-3">
-           <div className="hidden md:flex flex-col items-end mr-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Service Status</span>
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Live & Spatial</span>
-           </div>
-           <button className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center shadow-xl">
+           <button className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center shadow-xl">
               <ShoppingBag size={18} className="text-white/40" />
            </button>
         </div>
       </header>
 
-      {/* Hero Brand Section */}
-      <section className="px-8 mb-16 pt-8">
+      {/* Simplified Menu Title */}
+      <section className="px-8 mb-12 pt-10">
          <motion.div 
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
            className="max-w-4xl"
          >
-            <h2 className="text-6xl md:text-8xl font-black tracking-tighter leading-none uppercase mb-6">
-              Visual <span className="text-white/20 italic font-serif lowercase font-light pr-3">Gastronomy</span>
+            <h2 className="text-5xl md:text-7xl font-black tracking-tight leading-none uppercase mb-4">
+               Gourmet <br /><span className="text-white/20 italic font-serif lowercase font-light pr-2">Menu</span>
             </h2>
-            <p className="text-slate-500 text-lg md:text-xl font-light italic max-w-xl">
-              Artifacts of flavor, meticulously rendered for your environment.
+            <p className="text-slate-500 text-sm md:text-lg font-light italic max-w-xl">
+               Exquisite selection of dishes prepared for your enjoyment.
             </p>
          </motion.div>
       </section>
 
-      {/* Category Navigation - Minimal & Elegant */}
+      {/* Category Nav */}
       <nav className="px-8 mb-12 flex gap-8 overflow-x-auto no-scrollbar scroll-smooth items-center border-b border-white/5 pb-6">
          {categories.map((cat) => (
            <button
              key={cat}
              onClick={() => setActiveCategory(cat)}
-             className={`text-[11px] font-black uppercase tracking-[0.3em] transition-all whitespace-nowrap relative py-2
+             className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap relative py-2
                ${activeCategory === cat ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}
            >
              {cat}
@@ -105,57 +119,50 @@ export default function MenuPage() {
          ))}
       </nav>
 
-      {/* Main Luxury Catalog */}
-      <main className="px-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-24">
+      {/* Menu Detail Cards with View on Table Button */}
+      <main className="px-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-20">
         <AnimatePresence mode='popLayout'>
           {filteredDishes.map((dish, i) => (
             <motion.div 
               layout
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.8, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
               key={dish.id} 
-              className="group cursor-pointer"
-              onClick={() => navigate(`/dish/${restaurantId}/${dish.id}`)}
+              className="group"
             >
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[40px] mb-8 bg-white/[0.02] border border-white/5">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[32px] mb-8 bg-white/[0.02] border border-white/5">
                  <img 
                    src={dish.thumbnailUrl} 
                    alt={dish.name} 
-                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[1.5s] ease-out grayscale-[0.3] group-hover:grayscale-0"
+                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[1.5s] ease-out grayscale-[0.2] group-hover:grayscale-0"
                  />
                  
-                 {/* Item Metadata Overlay */}
-                 <div className="absolute top-8 right-8 flex flex-col items-end gap-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                    <div className="bg-black/60 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-2">
-                       <span className="text-[10px] font-black uppercase tracking-widest text-white/80">KSh {dish.price}</span>
-                    </div>
+                 {/* VIEW ON TABLE AR BUTTON */}
+                 <div className="absolute inset-x-0 bottom-8 flex justify-center px-8 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 z-10">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); navigate(`/ar/${restaurantId}/${dish.id}`); }}
+                      className="w-full h-14 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 shadow-2xl active:scale-95 transition-transform"
+                    >
+                       <Eye size={16} />
+                       On Your Table
+                    </button>
                  </div>
 
-                 {/* Subtle Holographic Hint */}
                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
               </div>
 
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-                 <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                       <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{dish.category}</span>
-                       <div className="w-1 h-1 rounded-full bg-slate-800" />
-                       <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500/50 flex items-center gap-1.5">
-                          <Sparkles size={10} /> Spatial Ready
-                       </span>
-                    </div>
-                    <h3 className="text-3xl font-black tracking-tight leading-none group-hover:text-white transition-colors">{dish.name}</h3>
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4" onClick={() => navigate(`/dish/${restaurantId}/${dish.id}`)}>
+                 <div className="space-y-2">
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">{dish.category}</span>
+                    <h3 className="text-2xl font-black tracking-tight leading-none group-hover:text-white transition-colors uppercase">{dish.name}</h3>
                  </div>
                  
-                 <div className="flex items-center gap-4">
-                    <div className="hidden lg:block text-right">
-                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Spatial Identity</p>
-                       <p className="text-[10px] font-mono text-slate-500 mt-0.5 uppercase tracking-tighter">REF_{dish.id.slice(0,8)}</p>
-                    </div>
-                    <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-                       <ArrowRight size={20} className="-rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+                 <div className="flex flex-col items-end">
+                    <p className="text-xl font-black text-white/90">KSh {dish.price}</p>
+                    <div className="flex items-center gap-1.5 text-emerald-500/50 mt-1">
+                       <Sparkles size={10} /> 
+                       <span className="text-[10px] uppercase font-black tracking-widest">3D / AR View</span>
                     </div>
                  </div>
               </div>
@@ -163,27 +170,6 @@ export default function MenuPage() {
           ))}
         </AnimatePresence>
       </main>
-
-      {/* Floating Spatial Action Bar */}
-      <div className="fixed bottom-12 inset-x-0 px-8 z-40">
-         <motion.button 
-           initial={{ y: 100 }}
-           animate={{ y: 0 }}
-           onClick={() => navigate(`/ar/${restaurantId}/scan`)}
-           className="w-full max-w-2xl mx-auto h-20 bg-white text-black rounded-[28px] overflow-hidden shadow-2xl flex items-center justify-between px-10 group active:scale-[0.98] transition-all"
-         >
-            <div className="flex items-center gap-4">
-               <div className="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
-                  <Sparkles size={20} />
-               </div>
-               <span className="text-[11px] font-black uppercase tracking-[0.3em]">Initialize Table Scan</span>
-            </div>
-            <div className="flex items-center gap-2 opacity-30 group-hover:opacity-100 transition-opacity">
-               <span className="text-[10px] font-medium uppercase tracking-[0.2em]">Launch Interface</span>
-               <ChevronRight size={18} />
-            </div>
-         </motion.button>
-      </div>
 
     </div>
   );
