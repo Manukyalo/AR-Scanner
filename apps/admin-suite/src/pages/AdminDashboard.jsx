@@ -340,32 +340,35 @@ function TabButton({ active, icon, label, onClick }) {
 
 function DishCard({ dish, onToggle, onEdit, onDelete }) {
   return (
-    <motion.div layout className="bg-white/[0.02] border border-white/5 rounded-[40px] p-8 flex flex-col md:flex-row gap-8 group hover:bg-white/[0.04] transition-all relative overflow-hidden">
-       <div className="w-full md:w-48 h-48 bg-white/5 rounded-[32px] overflow-hidden border border-white/5 relative">
-          <img src={dish.thumbnailUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+    <motion.div layout className="group relative bg-zinc-900/40 border border-white/5 rounded-[40px] p-8 flex flex-col md:flex-row gap-8 hover:bg-zinc-800/60 transition-all overflow-hidden shadow-2xl">
+       <div className="w-full md:w-36 h-36 bg-black/40 rounded-[32px] overflow-hidden border border-white/5 relative flex-shrink-0">
+          <img src={dish.thumbnailUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-60 group-hover:opacity-100" />
           <div className="absolute top-4 right-4"><div className={`w-2 h-2 rounded-full ${dish.active ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,1)]' : 'bg-slate-700'}`} /></div>
        </div>
        <div className="flex-1 flex flex-col justify-center">
           <div className="flex justify-between items-start mb-2">
-             <span className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-600">{dish.category}</span>
+             <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30">{dish.category}</span>
              <div className="flex gap-4">
-                <button onClick={onEdit} className="text-slate-600 hover:text-white transition-colors"><Edit3 size={18} /></button>
-                <button onClick={onDelete} className="text-slate-600 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
+                <button onClick={onEdit} className="text-white/20 hover:text-white transition-colors p-2"><Edit3 size={18} /></button>
+                <button onClick={onDelete} className="text-white/10 hover:text-red-500 transition-colors p-2"><Trash2 size={18} /></button>
              </div>
           </div>
-          <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-2">{dish.name}</h3>
-          <div className="flex items-center gap-5">
-             <span className="text-[11px] font-black text-white/40 tracking-widest">KSh {dish.price}</span>
+          <h3 className="text-xl font-bold uppercase tracking-tight text-white/90 mb-1">{dish.name}</h3>
+          <div className="flex items-center gap-4">
+             <span className="text-[10px] font-black text-white/40 tracking-[0.2em] uppercase">KSh {dish.price}</span>
              <div className="w-1 h-1 bg-white/10 rounded-full" />
-             <div className={`text-[9px] font-black uppercase tracking-widest ${dish.active ? 'text-emerald-500' : 'text-slate-600'}`}>
-                {dish.active ? 'Active on Menu' : 'Inactive'}
+             <div className={`text-[9px] font-black uppercase tracking-[0.2em] ${dish.active ? 'text-emerald-500/80' : 'text-white/20'}`}>
+                {dish.active ? 'Syncing with Portal' : 'Draft Mode'}
              </div>
           </div>
-          <button onClick={onToggle} className="mt-8 flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-white transition-colors">
-             <div className={`w-10 h-5 rounded-full p-1 transition-colors ${dish.active ? 'bg-emerald-500/20' : 'bg-white/5'}`}>
-                <div className={`w-3 h-3 rounded-full transition-all ${dish.active ? 'translate-x-5 bg-emerald-500' : 'translate-x-0 bg-slate-700'}`} />
+          <button onClick={onToggle} className="mt-8 flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-white transition-colors">
+             <div className={`w-10 h-5 rounded-full p-1 transition-colors ${dish.active ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-white/5 border border-white/10'}`}>
+                <motion.div 
+                  layout
+                  className={`w-2.5 h-2.5 rounded-full ${dish.active ? 'translate-x-5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'translate-x-0 bg-white/10'}`} 
+                />
              </div>
-             Toggle State
+             Status Update
           </button>
        </div>
     </motion.div>
@@ -437,76 +440,99 @@ function SettingsTab({ restaurant, restaurantId }) {
   };
 
   return (
-    <section className="animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-3xl">
-       <div className="space-y-4 mb-20">
-          <h2 className="text-6xl font-black tracking-tighter uppercase leading-none">Global Config</h2>
-          <p className="text-slate-500 font-light tracking-widest text-sm max-w-xl">Centralized brand DNA and external bridge configuration.</p>
+    <section className="animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-2xl mx-auto md:mx-0">
+       <div className="space-y-4 mb-20 px-4 md:px-0 text-center md:text-left">
+          <h2 className="text-5xl md:text-6xl font-black tracking-tighter uppercase leading-none">Global Config</h2>
+          <p className="text-white/20 font-light tracking-[0.2em] uppercase text-[10px] max-w-xl">Centralized brand DNA and external bridge configuration.</p>
        </div>
 
-       <form onSubmit={handleSubmit} className="space-y-12 bg-white/[0.02] border border-white/5 rounded-[50px] p-16">
-          <div className="grid grid-cols-2 gap-10">
-             <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-700 pl-4">Brand Title</label>
-                <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full h-18 bg-white/5 border border-white/5 rounded-3xl px-8 focus:outline-none focus:border-white/20 transition-all font-light" />
+       <form onSubmit={handleSubmit} className="space-y-16">
+          {/* Identity Hub */}
+          <div className="space-y-8 bg-zinc-900/40 border border-white/5 rounded-[48px] p-10 md:p-12 shadow-2xl">
+             <div className="flex items-center gap-4 mb-4">
+                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                   <Plus size={14} className="text-white/40" />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/90">Identity Matrix</h3>
              </div>
-             <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-700 pl-4">Logo Source</label>
-                <div className="relative h-18 bg-white/5 border border-white/5 rounded-3xl flex items-center px-8 group overflow-hidden">
-                   {formData.logo ? (
-                     <img src={formData.logo} alt="Logo Preview" className="h-8 w-auto object-contain mr-4" />
-                   ) : (
-                     <ImageIcon size={18} className="text-slate-600 mr-4" />
-                   )}
-                   <span className="text-xs font-light text-slate-400 truncate flex-1">
-                     {formData.logo ? 'Brand Asset Online' : 'Select Brand Artifact...'}
-                   </span>
-                   <input 
-                     type="file" 
-                     accept="image/*" 
-                     onChange={e => handleLogoUpload(e.target.files[0])} 
-                     className="absolute inset-0 opacity-0 cursor-pointer" 
-                   />
-                   {uploadProgress > 0 && (
-                     <motion.div 
-                       initial={{ width: 0 }} 
-                       animate={{ width: `${uploadProgress}%` }} 
-                       className="absolute bottom-0 left-0 h-0.5 bg-white" 
-                     />
-                   )}
+             
+             <div className="space-y-10">
+                <LuxuryInput 
+                  label="Brand Name" 
+                  value={formData.name} 
+                  onChange={e => setFormData({...formData, name: e.target.value})} 
+                  placeholder="The Gourmet Kitchen"
+                />
+
+                <div className="space-y-4">
+                  <LuxuryLabel label="Brand Asset (Logo)" />
+                  <div className="relative h-20 bg-black/40 border border-white/5 rounded-3xl flex items-center px-8 overflow-hidden group">
+                     {formData.logo ? (
+                       <img src={formData.logo} alt="Logo" className="h-8 w-auto object-contain mr-6" />
+                     ) : (
+                       <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mr-6">
+                         <ImageIcon size={18} className="text-white/20" />
+                       </div>
+                     )}
+                     <div className="flex-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">
+                           {formData.logo ? 'Resource Synchronized' : 'Null Object / Empty'}
+                        </p>
+                        <p className="text-[10px] text-white/10 tracking-tighter font-mono truncate">{formData.logo || 'Select high-resolution brand artifact...'}</p>
+                     </div>
+                     <input type="file" accept="image/*" onChange={e => handleLogoUpload(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
+                     {uploadProgress > 0 && (
+                       <motion.div initial={{ width: 0 }} animate={{ width: `${uploadProgress}%` }} className="absolute bottom-0 left-0 h-0.5 bg-white shadow-[0_0_15px_white]" />
+                     )}
+                  </div>
                 </div>
              </div>
           </div>
 
-          <div className="pt-8 border-t border-white/10 space-y-10">
-             <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-700 pl-4">Guest Portal Deployment URL</label>
-                <input type="url" placeholder="https://guest-portal..." value={formData.guestPortalUrl} onChange={e => setFormData({...formData, guestPortalUrl: e.target.value})} className="w-full h-18 bg-white/5 border border-white/5 rounded-3xl px-8 focus:outline-none focus:border-white/20 transition-all font-light" />
+          {/* Infrastructure Layer */}
+          <div className="space-y-8 bg-zinc-900/40 border border-white/5 rounded-[48px] p-10 md:p-12 shadow-2xl">
+             <div className="flex items-center gap-4 mb-4">
+                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                   <Settings size={14} className="text-white/40" />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/90">Infrastructure Bridge</h3>
              </div>
 
-             <div className="flex items-center gap-10">
-                <div className="w-48 h-48 bg-white/5 rounded-[32px] border border-white/10 flex items-center justify-center overflow-hidden relative group p-4">
-                   {qrCodeData ? (
-                     <>
-                        <img src={qrCodeData} alt="QR Code" className="w-full h-full object-contain rounded-2xl" />
-                        <div onClick={handleDownloadQR} className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                           <Download className="text-white" size={24} />
-                        </div>
-                     </>
-                   ) : (
-                     <QrCode className="text-white/10" size={40} />
-                   )}
-                </div>
-                <div className="space-y-4 max-w-xs">
-                   <h3 className="text-xl font-black uppercase tracking-tighter">Physical Gateway</h3>
-                   <p className="text-sm text-slate-500 font-light leading-relaxed">
-                     Input the hosted Vercel domain for the Guest Portal to synthesize a scannable access code for table placements and physical menus.
-                   </p>
+             <div className="space-y-12">
+                <LuxuryInput 
+                  label="Deployment Endpoint" 
+                  value={formData.guestPortalUrl} 
+                  onChange={e => setFormData({...formData, guestPortalUrl: e.target.value})} 
+                  placeholder="https://gourmet-client.vercel.app"
+                  type="url"
+                />
+
+                <div className="flex flex-col md:flex-row items-center gap-10 pt-4">
+                   <div className="w-44 h-44 bg-black/40 rounded-[32px] border border-white/5 flex items-center justify-center overflow-hidden relative group p-4 shrink-0 shadow-2xl">
+                      {qrCodeData ? (
+                        <>
+                           <img src={qrCodeData} alt="QR" className="w-full h-full object-contain filter invert opacity-90 group-hover:opacity-100 transition-opacity" />
+                           <button onClick={handleDownloadQR} className="absolute inset-0 bg-black/80 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                              <Download className="text-white" size={24} />
+                              <span className="text-[8px] font-black uppercase tracking-widest">Download Asset</span>
+                           </button>
+                        </>
+                      ) : (
+                        <QrCode className="text-white/5" size={40} />
+                      )}
+                   </div>
+                   <div className="space-y-4">
+                      <h4 className="text-lg font-bold tracking-tighter uppercase text-white/90">Physical Gateway</h4>
+                      <p className="text-[10px] text-white/20 uppercase tracking-[0.2em] font-medium leading-relaxed">
+                         Synthesize a scannable access point to broadcast your culinary catalog into the client's physical environment.
+                      </p>
+                   </div>
                 </div>
              </div>
           </div>
 
-          <button type="submit" disabled={saving} className="w-full h-20 bg-white text-black rounded-3xl font-black uppercase tracking-[0.3em] text-xs shadow-2xl hover:bg-slate-200 transition-all disabled:opacity-50">
-             {saving ? 'Synchronizing Intelligence...' : 'Commit Settings'}
+          <button type="submit" disabled={saving} className="w-full h-24 bg-white text-black rounded-[32px] font-black uppercase tracking-[0.4em] text-xs shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:bg-slate-200 transition-all active:scale-[0.98] disabled:opacity-50">
+             {saving ? 'Transmitting Data...' : 'Commit System Update'}
           </button>
        </form>
     </section>
@@ -519,11 +545,9 @@ function DishModal({ dish, restaurantId, onClose, setUploadProgress, uploadProgr
     description: dish?.description || '',
     price: dish?.price || 0,
     category: dish?.category || 'Mains',
-    calories: dish?.calories || 0,
+    active: dish ? dish.active : true,
     thumbnailUrl: dish?.thumbnailUrl || '',
-    modelUrl: dish?.modelUrl || '',
-    ingredients: dish?.ingredients || [],
-    active: dish ? dish.active : true
+    modelUrl: dish?.modelUrl || ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -555,57 +579,104 @@ function DishModal({ dish, restaurantId, onClose, setUploadProgress, uploadProgr
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[150] flex items-center justify-center p-8 bg-black/90 backdrop-blur-xl">
-       <div className="bg-zinc-950 border border-white/5 w-full max-w-5xl rounded-[60px] overflow-hidden flex flex-col shadow-2xl">
-          <div className="p-12 pb-0 flex justify-between items-start">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-8 bg-black/95 backdrop-blur-2xl overflow-y-auto no-scrollbar">
+       <div className="bg-neutral-950 border border-white/10 w-full max-w-4xl rounded-[48px] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] my-auto">
+          <div className="p-10 pb-4 flex justify-between items-start">
              <div className="space-y-2">
-                <h2 className="text-4xl font-black uppercase tracking-tight">Metadata Entry</h2>
-                <p className="text-slate-600 text-xs font-black uppercase tracking-[0.4em]">Spatial Registry ID: 0xFD...201</p>
+                <h2 className="text-3xl font-black uppercase tracking-tight text-white/90">Asset Metadata</h2>
+                <div className="flex items-center gap-2">
+                   <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                   <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Registry Ingestion Active</span>
+                </div>
              </div>
-             <button onClick={onClose} className="p-5 bg-white/5 rounded-full hover:bg-white/10 transition"><X size={28} /></button>
+             <button onClick={onClose} className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center hover:bg-white/10 transition"><X size={20} /></button>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-12 space-y-12 no-scrollbar">
-             <div className="grid grid-cols-2 gap-10">
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-800">Dish Title</label>
-                   <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full h-16 bg-white/5 border border-white/5 rounded-3xl px-8 focus:outline-none text-sm" />
-                </div>
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-800">Exchange Value (KSh)</label>
-                   <input required type="number" value={formData.price} onChange={e => setFormData({...formData, price: Number(e.target.value)})} className="w-full h-16 bg-white/5 border border-white/5 rounded-3xl px-8 focus:outline-none text-sm" />
-                </div>
+          <form onSubmit={handleSubmit} className="p-10 space-y-12">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <LuxuryInput 
+                   label="Dish Title" 
+                   value={formData.name} 
+                   onChange={e => setFormData({...formData, name: e.target.value})} 
+                   placeholder="e.g. Wagyu Ribeye"
+                   required
+                />
+                <LuxuryInput 
+                   label="Exchange Value (KSh)" 
+                   type="number"
+                   value={formData.price} 
+                   onChange={e => setFormData({...formData, price: Number(e.target.value)})} 
+                   placeholder="0"
+                   required
+                />
              </div>
 
-             <div className="grid grid-cols-2 gap-10">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-4">
-                   <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-800">Asset Mesh (.GLB)</label>
-                   <div className="relative h-48 bg-white/5 border border-dashed border-white/10 rounded-[40px] flex flex-col items-center justify-center group overflow-hidden">
-                      <Box className={`mb-3 ${formData.modelUrl ? 'text-white' : 'text-white/10'}`} size={40} />
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em]">{formData.modelUrl ? 'Mesh Online' : 'Upload Mesh'}</span>
+                   <LuxuryLabel label="Asset Geometry (.GLB)" />
+                   <div className="relative h-44 bg-black/40 border border-white/5 rounded-[32px] flex flex-col items-center justify-center group overflow-hidden border-dashed hover:border-white/20 transition-colors">
+                      <Box className={`mb-4 ${formData.modelUrl ? 'text-white' : 'text-white/10'}`} size={32} />
+                      <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                         {formData.modelUrl ? 'Asset Synchronized' : 'Upload Mesh Artifact'}
+                      </span>
                       <input type="file" accept=".glb" onChange={e => handleFileUpload(e.target.files[0], 'modelUrl')} className="absolute inset-0 opacity-0 cursor-pointer" />
+                      {uploadProgress > 0 && formData.modelUrl === '' && (
+                         <div className="absolute bottom-0 left-0 h-0.5 bg-white shadow-[0_0_10px_white]" style={{ width: `${uploadProgress}%` }} />
+                      )}
                    </div>
                 </div>
                 <div className="space-y-4">
-                   <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-800">Texture Map (PNG)</label>
-                   <div className="relative h-48 bg-white/5 border border-dashed border-white/10 rounded-[40px] flex flex-col items-center justify-center group overflow-hidden">
-                      {formData.thumbnailUrl ? <img src={formData.thumbnailUrl} className="absolute inset-0 w-full h-full object-cover opacity-20" /> : <ImageIcon className="mb-3 text-white/10" size={40} />}
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em]">Upload Texture</span>
+                   <LuxuryLabel label="Surface Map (PNG/JPG)" />
+                   <div className="relative h-44 bg-black/40 border border-white/5 rounded-[32px] flex flex-col items-center justify-center group overflow-hidden border-dashed hover:border-white/20 transition-colors">
+                      {formData.thumbnailUrl ? (
+                        <img src={formData.thumbnailUrl} className="absolute inset-0 w-full h-full object-cover opacity-30" />
+                      ) : (
+                        <ImageIcon className="mb-4 text-white/10" size={32} />
+                      )}
+                      <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                         {formData.thumbnailUrl ? 'Texture Map Active' : 'Upload Texture Source'}
+                      </span>
                       <input type="file" accept="image/*" onChange={e => handleFileUpload(e.target.files[0], 'thumbnailUrl')} className="absolute inset-0 opacity-0 cursor-pointer" />
+                      {uploadProgress > 0 && formData.thumbnailUrl === '' && (
+                         <div className="absolute bottom-0 left-0 h-0.5 bg-white shadow-[0_0_10px_white]" style={{ width: `${uploadProgress}%` }} />
+                      )}
                    </div>
                 </div>
              </div>
 
-             {uploadProgress > 0 && <div className="h-1 bg-white/5 rounded-full overflow-hidden"><motion.div initial={{ width: 0 }} animate={{ width: `${uploadProgress}%` }} className="h-full bg-white shadow-[0_0_20px_white]" /></div>}
-
-             <div className="flex gap-4 pt-10">
-                <button onClick={handleSubmit} disabled={isSubmitting} className="flex-1 h-24 bg-white text-black rounded-3xl font-black uppercase tracking-[0.4em] text-sm shadow-2xl flex items-center justify-center gap-4 hover:bg-slate-200 transition-all active:scale-95">
-                   {isSubmitting ? <Loader2 className="animate-spin" /> : <Check size={24} />}
-                   {dish?.id ? 'Commit Update' : 'Initialize Asset'}
+             <div className="pt-6">
+                <button type="submit" disabled={isSubmitting} className="w-full h-24 bg-white text-black rounded-[32px] font-black uppercase tracking-[0.4em] text-xs shadow-2xl flex items-center justify-center gap-4 hover:bg-slate-200 transition-all active:scale-[0.98] disabled:opacity-50">
+                   {isSubmitting ? <Loader2 className="animate-spin" /> : <Check size={20} />}
+                   {dish?.id ? 'Commit Registry Change' : 'Initialize New Asset'}
                 </button>
              </div>
           </form>
        </div>
     </motion.div>
+  );
+}
+
+// --- Luxury UI Helper Components ---
+function LuxuryInput({ label, type = "text", value, onChange, placeholder, required = false }) {
+  return (
+    <div className="space-y-3">
+       <LuxuryLabel label={label} />
+       <input 
+         required={required}
+         type={type} 
+         value={value} 
+         onChange={onChange}
+         placeholder={placeholder}
+         className="w-full h-16 bg-black/40 border border-white/5 rounded-2xl px-8 focus:outline-none focus:border-white/20 transition-all font-light text-sm text-white placeholder:text-white/10"
+       />
+    </div>
+  );
+}
+
+function LuxuryLabel({ label }) {
+  return (
+    <label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 pl-2">
+       {label}
+    </label>
   );
 }
