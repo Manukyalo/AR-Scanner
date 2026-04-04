@@ -327,11 +327,30 @@ function DishCard({ dish, onToggle, onEdit, onDelete }) {
 function SettingsTab({ restaurant, restaurantId }) {
   const [formData, setFormData] = useState({ name: '', brandColor: '#ffffff', ctaLabel: '', ctaUrl: '', logo: '', guestPortalUrl: '' });
   const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [qrCodeData, setQrCodeData] = useState('');
 
   useEffect(() => { 
     if (restaurant) setFormData({ guestPortalUrl: '', ...restaurant }); 
   }, [restaurant]);
+
+  const handleLogoUpload = async (file) => {
+    if (!file) return;
+    setSaving(true);
+    const storageRef = ref(storage, `restaurants/${restaurantId}/brand/logo-${Date.now()}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+    
+    uploadTask.on('state_changed', 
+      (snap) => setUploadProgress((snap.bytesTransferred / snap.totalBytes) * 100),
+      (err) => { alert('Logo Upload Failed'); setSaving(false); }, 
+      async () => {
+        const url = await getDownloadURL(uploadTask.snapshot.ref);
+        setFormData(prev => ({ ...prev, logo: url }));
+        setSaving(false);
+        setUploadProgress(0);
+      }
+    );
+  };
 
   useEffect(() => {
     const generateQR = async () => {
@@ -383,7 +402,29 @@ function SettingsTab({ restaurant, restaurantId }) {
              </div>
              <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-700 pl-4">Logo Source</label>
-                <input type="text" value={formData.logo} onChange={e => setFormData({...formData, logo: e.target.value})} className="w-full h-18 bg-white/5 border border-white/5 rounded-3xl px-8 focus:outline-none font-light" />
+                <div className="relative h-18 bg-white/5 border border-white/5 rounded-3xl flex items-center px-8 group overflow-hidden">
+                   {formData.logo ? (
+                     <img src={formData.logo} alt="Logo Preview" className="h-8 w-auto object-contain mr-4" />
+                   ) : (
+                     <ImageIcon size={18} className="text-slate-600 mr-4" />
+                   )}
+                   <span className="text-xs font-light text-slate-400 truncate flex-1">
+                     {formData.logo ? 'Brand Asset Online' : 'Select Brand Artifact...'}
+                   </span>
+                   <input 
+                     type="file" 
+                     accept="image/*" 
+                     onChange={e => handleLogoUpload(e.target.files[0])} 
+                     className="absolute inset-0 opacity-0 cursor-pointer" 
+                   />
+                   {uploadProgress > 0 && (
+                     <motion.div 
+                       initial={{ width: 0 }} 
+                       animate={{ width: `${uploadProgress}%` }} 
+                       className="absolute bottom-0 left-0 h-0.5 bg-white" 
+                     />
+                   )}
+                </div>
              </div>
           </div>
 

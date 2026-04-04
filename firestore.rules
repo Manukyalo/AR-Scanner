@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Guest Access: Allow public read of restaurant info and dishes
+    match /restaurants/{restaurantId} {
+      allow read: if true;
+      match /dishes/{dishId} {
+        allow read: if true;
+      }
+    }
+    
+    // 2. Admin Access: Allow read/write for ANY authenticated user (demo)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
