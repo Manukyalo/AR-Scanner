@@ -26,12 +26,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/admin" element={<AdminLoginPage />} />
+        <Route path="/" element={<AdminLoginPage />} />
         <Route 
-          path="/admin/dashboard" 
-          element={user ? <AdminDashboard /> : <Navigate to="/admin" />} 
+          path="/dashboard" 
+          element={user ? <AdminDashboard /> : <Navigate to="/" />} 
         />
-        <Route path="*" element={<Navigate to="/admin" />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );
