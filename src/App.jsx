@@ -7,9 +7,28 @@ import ARViewPage from './pages/ARViewPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebase/config';
+
 function App() {
-  // Simple mock for protected route
-  const isAuthenticated = true; // In a real app, this would check Firebase Auth
+  const [user, setUser] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-slate-800 border-t-purple-500 rounded-full animate-spin" />
+    </div>
+  );
+
+  const isAuthenticated = !!user;
 
   return (
     <Router>

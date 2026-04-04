@@ -1,43 +1,121 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase/config';
+import { motion } from 'framer-motion';
+import { Lock, Mail, ChevronRight, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/admin/dashboard');
+    } catch (err) {
+      console.error(err);
+      setError('Invalid credentials. Please verify your access key.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black">
-      <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-gradient-to-tr from-purple-600 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/20">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <h2 className="text-4xl font-black text-white">Restaurant Admin</h2>
-          <p className="text-slate-400 mt-2">Sign in to manage your immersive menu</p>
-        </div>
-
-        <form className="mt-8 space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/admin/dashboard'); }}>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Email Domain</label>
-              <input type="email" required className="w-full h-14 px-5 bg-slate-800 border border-slate-700 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition" placeholder="admin@restaurant.com" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Secret Access Key</label>
-              <input type="password" required className="w-full h-14 px-5 bg-slate-800 border border-slate-700 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition" placeholder="••••••••" />
-            </div>
-          </div>
-
-          <button type="submit" className="w-full h-14 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl text-white font-bold text-lg shadow-xl hover:scale-[1.02] active:scale-95 transition-all">
-            Secure Login
-          </button>
-        </form>
-
-        <button onClick={() => navigate('/')} className="w-full text-slate-500 text-sm hover:text-white transition">
-           Return to Landing
-        </button>
+    <div className="min-h-screen bg-black flex items-center justify-center p-6 font-['Outfit']">
+      {/* Background Decor */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
       </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md relative z-10"
+      >
+        <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[40px] p-10 shadow-2xl">
+          <div className="flex flex-col items-center mb-12">
+             <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center border border-white/10 mb-6 group hover:border-purple-500/50 transition-colors">
+               <Lock className="text-white/40 group-hover:text-white transition-colors" size={32} />
+             </div>
+             <h1 className="text-3xl font-black text-white tracking-tight uppercase">Admin Access</h1>
+             <p className="text-slate-500 text-sm mt-2 font-light">Enter credentials to manage your AR ecosystem</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl flex items-center gap-3 text-red-400 text-sm"
+              >
+                <AlertCircle size={18} />
+                {error}
+              </motion.div>
+            )}
+
+            <div className="space-y-4">
+              <div className="relative group">
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-white transition-colors" size={20} />
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Admin Email"
+                  className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl pl-14 pr-6 text-white focus:outline-none focus:border-white/20 transition-all font-light"
+                  required
+                />
+              </div>
+
+              <div className="relative group">
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-white transition-colors" size={20} />
+                <input 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Access Key"
+                  className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl pl-14 pr-6 text-white focus:outline-none focus:border-white/20 transition-all font-light"
+                  required
+                />
+              </div>
+            </div>
+
+            <button 
+              disabled={isLoading}
+              type="submit" 
+              className="group relative w-full h-16 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-slate-200 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="animate-spin" size={18} />
+                  <span>Authorizing...</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <span>Sign In</span>
+                  <ChevronRight size={18} className="translate-x-0 group-hover:translate-x-1 transition-transform" />
+                </div>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-10 flex justify-center">
+            <button 
+              onClick={() => navigate('/')}
+              className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 hover:text-white transition-colors"
+            >
+              Return to Terminal
+            </button>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
