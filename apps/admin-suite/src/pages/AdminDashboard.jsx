@@ -117,8 +117,21 @@ export default function AdminDashboard() {
         </button>
       </aside>
 
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-20 bg-black/80 backdrop-blur-2xl border-b border-white/5 flex items-center justify-between px-8 z-[60]">
+        <div className="flex items-center gap-3">
+           <div className="w-8 h-8 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center">
+              <Sparkles size={14} className="text-white/40" />
+           </div>
+           <div>
+             <h1 className="text-xs font-black tracking-tighter uppercase leading-none">{restaurant?.name || 'ADMIN'}</h1>
+             <span className="text-[8px] font-black tracking-[0.3em] text-slate-600 uppercase mt-0.5 block">Creator Suite</span>
+           </div>
+        </div>
+      </header>
+
       {/* Main Content */}
-      <main className="lg:ml-80 min-h-screen p-10 lg:p-20">
+      <main className="lg:ml-80 min-h-screen p-8 lg:p-20 pt-28 lg:pt-20 pb-32 lg:pb-20">
         {activeTab === 'dishes' ? (
           <section className="space-y-20 animate-in fade-in slide-in-from-bottom-4 duration-1000">
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
@@ -183,6 +196,27 @@ export default function AdminDashboard() {
           />
         )}
       </AnimatePresence>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] h-20 bg-zinc-900/80 backdrop-blur-3xl border border-white/10 rounded-[28px] flex items-center justify-around px-4 z-[60] shadow-2xl">
+         <MobileNavItem active={activeTab === 'dishes'} onClick={() => setActiveTab('dishes')} icon={<Layers size={22} />} />
+         
+         <button 
+           onClick={() => setIsScanning(true)}
+           className="w-14 h-14 bg-white text-black rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 transition-all"
+         >
+           <Plus size={24} />
+         </button>
+
+         <MobileNavItem active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon={<Settings size={22} />} />
+         
+         <button 
+           onClick={handleLogout}
+           className="p-3 text-slate-600 active:text-red-500 transition-colors"
+         >
+           <LogOut size={22} />
+         </button>
+      </nav>
 
     </div>
   );
@@ -275,6 +309,21 @@ function VisionScanner({ onClose, onCaptured }) {
       </div>
 
     </motion.div>
+  );
+}
+
+// --- Mobile Navigation Components ---
+function MobileNavItem({ active, icon, onClick }) {
+  return (
+    <button 
+      onClick={onClick} 
+      className={`relative p-3 transition-all ${active ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}
+    >
+      {icon}
+      {active && (
+        <motion.div layoutId="mobileTab" className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />
+      )}
+    </button>
   );
 }
 
