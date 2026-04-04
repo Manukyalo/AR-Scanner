@@ -5,5 +5,11 @@
   "workspaces": [
     "apps/*",
     "shared"
-  ]
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "build:guest": "npm run build --workspace=apps/guest-portal",
+    "build:admin": "npm run build --workspace=apps/admin-suite"
+  }
 }
