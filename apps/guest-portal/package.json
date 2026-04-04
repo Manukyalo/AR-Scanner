@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-three/drei": "^9.121.3",
+    "@react-three/fiber": "^8.17.14",
     "firebase": "^12.11.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
@@ -18,8 +20,8 @@
     "three": "^0.183.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.0.1",
     "@tailwindcss/vite": "^4.2.2",
+    "@vitejs/plugin-react": "^6.0.1",
     "tailwindcss": "^4.2.2",
     "vite": "^8.0.1",
     "vite-plugin-pwa": "^1.2.0"
