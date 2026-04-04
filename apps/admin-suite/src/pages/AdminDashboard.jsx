@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { auth, db, storage } from '../firebase/config';
+import { auth, db, storage } from '@shared/firebase/config';
 import { 
   collection, 
   doc, 
