@@ -110,7 +110,7 @@ export default function MenuPage() {
             <div className="p-3.5 space-y-2">
               <h3 className="font-bold text-sm leading-tight group-hover:text-purple-400 transition line-clamp-1">{dish.name}</h3>
               <div className="flex justify-between items-center">
-                <span className="text-purple-400 font-extrabold text-lg">${dish.price}</span>
+                <span className="text-purple-400 font-extrabold text-lg">KSh {dish.price}</span>
                 <span className="text-[10px] text-slate-500 font-mono">{dish.calories} kcal</span>
               </div>
             </div>

@@ -20,13 +20,34 @@ export default function ARViewPage() {
   useEffect(() => {
     async function fetchDish() {
       try {
-        const dishDoc = await getDoc(doc(db, `restaurants/${restaurantId}/dishes`, dishId));
-        if (dishDoc.exists()) {
-          setDish(dishDoc.data());
+        let dishData = null;
+        
+        if (dishId === 'scan') {
+          // "Scan Menu" mode: Fetch the first available dish as a baseline
+          const { collection, getDocs, limit, query } = await import('firebase/firestore');
+          const q = query(collection(db, `restaurants/${restaurantId}/dishes`), limit(1));
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            dishData = querySnapshot.docs[0].data();
+          }
+        } else {
+          // Direct dish view mode
+          const dishDoc = await getDoc(doc(db, `restaurants/${restaurantId}/dishes`, dishId));
+          if (dishDoc.exists()) {
+            dishData = dishDoc.data();
+          }
+        }
+
+        if (dishData) {
+          setDish(dishData);
+        } else {
+          setError("Dish not found.");
+          setIsInitializing(false);
         }
       } catch (err) {
         console.error("Error fetching dish:", err);
         setError("Could not load dish details.");
+        setIsInitializing(false);
       }
     }
     fetchDish();

@@ -78,7 +78,7 @@ export default function DishDetailPage() {
               </h1>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-3xl font-black text-purple-400">${dish.price}</span>
+              <span className="text-3xl font-black text-purple-400">KSh {dish.price}</span>
               <span className="text-xs text-slate-500 mt-1 font-mono tracking-widest uppercase">{dish.calories} kcal</span>
             </div>
           </div>
