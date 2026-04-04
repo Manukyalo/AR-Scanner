@@ -224,11 +224,13 @@ export default function AdminDashboard() {
 
 // --- Vision Scanner Component ---
 function VisionScanner({ onClose, onCaptured }) {
-  const [step, setStep] = useState('viewfinder'); // viewfinder | analysis | complete
+  const [step, setStep] = useState('aim'); // aim | capture_object | capture_env | processing | complete
+  const [progress, setProgress] = useState(0);
+  const [scanStatus, setScanStatus] = useState('Ready');
   const videoRef = useRef(null);
 
   useEffect(() => {
-    if (step === 'viewfinder') {
+    if (['aim', 'capture_object', 'capture_env'].includes(step)) {
       navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
         .then(stream => { if (videoRef.current) videoRef.current.srcObject = stream; })
         .catch(err => console.error("Camera access denied", err));
@@ -240,74 +242,225 @@ function VisionScanner({ onClose, onCaptured }) {
     };
   }, [step]);
 
-  const handleCapture = () => {
-    setStep('analysis');
-    setTimeout(() => setStep('complete'), 3000);
-  };
+  // Simulate Object Capture Progress
+  useEffect(() => {
+    if (step === 'capture_object') {
+       setScanStatus('Mapping Geometry');
+       const timer = setInterval(() => {
+          setProgress(p => {
+             if (p >= 100) {
+                clearInterval(timer);
+                setTimeout(() => { setStep('capture_env'); setProgress(0); }, 1000);
+                return 100;
+             }
+             return p + 1.25;
+          });
+       }, 50);
+       return () => clearInterval(timer);
+    }
+  }, [step]);
+
+  // Simulate Env Capture Progress
+  useEffect(() => {
+    if (step === 'capture_env') {
+       setScanStatus('Analyzing Lux...');
+       const timer = setInterval(() => {
+          setProgress(p => {
+             if (p >= 100) {
+                clearInterval(timer);
+                setTimeout(() => { setStep('processing'); setProgress(0); }, 1000);
+                return 100;
+             }
+             return p + 2.8;
+          });
+       }, 50);
+       return () => clearInterval(timer);
+    }
+  }, [step]);
+
+  // Simulate Processing Progress
+  useEffect(() => {
+    if (step === 'processing') {
+       setScanStatus('Synthesizing Artifact...');
+       const timer = setInterval(() => {
+          setProgress(p => {
+             if (p >= 100) {
+                clearInterval(timer);
+                setTimeout(() => { 
+                   onCaptured({ 
+                      name: 'Scanned Artifact', 
+                      category: 'Mains',
+                      price: 2500,
+                      modelUrl: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+                      thumbnailUrl: 'https://modelviewer.dev/shared-assets/models/Astronaut.png'
+                   }); 
+                }, 1500);
+                return 100;
+             }
+             return p + 1.8;
+          });
+       }, 50);
+       return () => clearInterval(timer);
+    }
+  }, [step, onCaptured]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black flex flex-col font-['Outfit']">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-black flex flex-col font-['Outfit'] overflow-hidden">
       
-      {/* 1. Camera View */}
-      <div className="relative flex-1 bg-zinc-900 overflow-hidden">
-         {step === 'viewfinder' && (
-           <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover opacity-60" />
+      {/* 1. Spatial Viewfinder Foundation */}
+      <div className="relative flex-1 bg-black overflow-hidden">
+         {['aim', 'capture_object', 'capture_env'].includes(step) && (
+            <video 
+              ref={videoRef} 
+              autoPlay 
+              playsInline 
+              className="w-full h-full object-cover opacity-60 grayscale contrast-125 brightness-75 scale-105" 
+            />
          )}
-         
-         {/* HUD Overlay */}
-         <div className="absolute inset-0 pointer-events-none flex flex-col">
-            <div className="p-10 flex justify-between items-start pointer-events-auto">
-               <button onClick={onClose} className="w-14 h-14 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center"><X size={24} /></button>
-               <div className="bg-black/40 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-2xl flex items-center gap-3">
-                  <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">REC // SPATIAL_INGEST</span>
-               </div>
-            </div>
 
-            <div className="flex-1 flex items-center justify-center p-20">
-               <div className="w-full h-full border-2 border-white/10 rounded-[60px] relative">
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black border border-white/10 px-8 py-2 rounded-full">
-                     <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.5em]">Target Alignment</span>
+         {/* Scanning Layers HUD */}
+         <div className="absolute inset-0 pointer-events-none flex flex-col p-8 md:p-12">
+            
+            {/* Header Telemetry */}
+            <div className="flex justify-between items-start pointer-events-auto">
+               <button 
+                 onClick={onClose} 
+                 className="w-14 h-14 bg-black/40 backdrop-blur-3xl border border-white/10 rounded-2xl flex items-center justify-center hover:bg-black transition-all"
+               >
+                  <X size={24} />
+               </button>
+               <div className="flex flex-col items-end gap-2 text-right">
+                  <div className="bg-white/5 backdrop-blur-2xl border border-white/10 px-6 py-3 rounded-2xl flex items-center gap-3">
+                     <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_#10b981]" />
+                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">SPATIAL // ACTIVE</span>
                   </div>
-                  {/* Scan Line */}
-                  <motion.div 
-                    initial={{ top: '10%' }}
-                    animate={{ top: '90%' }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-x-0 h-[1px] bg-white/20 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
-                  />
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">Protocol v4.2.9</span>
                </div>
             </div>
 
-            <div className="p-10 flex flex-col items-center gap-6">
-               {step === 'viewfinder' ? (
-                 <button 
-                   onClick={handleCapture}
-                   className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.3)] pointer-events-auto active:scale-90 transition-transform"
-                 >
-                    <div className="w-20 h-20 border-2 border-black rounded-full" />
-                 </button>
-               ) : (
-                 <div className="bg-black/80 backdrop-blur-3xl border border-white/10 p-10 rounded-[40px] w-full max-w-lg text-center space-y-4">
-                    <Loader2 size={32} className="animate-spin mx-auto text-white" />
-                    <h3 className="text-lg font-black uppercase tracking-widest">
-                       {step === 'analysis' ? 'Parsing Culinary Geometry...' : 'Neural Reconstruction Complete'}
-                    </h3>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-[0.4em]">Asset Ref: 0x7E3...A92</p>
-                    {step === 'complete' && (
-                      <button 
-                        onClick={() => onCaptured({ name: 'New Scanned Dish', category: 'Mains', price: 1500 })}
-                        className="mt-6 w-full bg-white text-black py-5 rounded-2xl font-black uppercase tracking-widest text-xs pointer-events-auto"
-                      >
-                         Access Matrix Data
-                      </button>
-                    )}
-                 </div>
-               )}
+            {/* Main Stage: Ingestion States */}
+            <div className="flex-1 flex flex-col items-center justify-center relative">
+               <AnimatePresence mode="wait">
+                  {step === 'aim' && (
+                    <motion.div key="aim" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="relative text-center">
+                       {/* High-Tech Reticle */}
+                       <div className="w-72 h-72 border border-white/5 rounded-full flex items-center justify-center relative mx-auto">
+                          <motion.div 
+                            animate={{ rotate: 360 }} 
+                            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-[10px] border border-dashed border-white/10 rounded-full" 
+                          />
+                          <motion.div 
+                            animate={{ rotate: -360 }} 
+                            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-[30px] border-2 border-t-white/20 border-transparent rounded-full" 
+                          />
+                          <div className="w-4 h-4 bg-white/10 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.2)]" />
+                       </div>
+                       
+                       <div className="absolute -bottom-36 left-1/2 -translate-x-1/2 w-80 pointer-events-auto">
+                          <button 
+                            onClick={() => setStep('capture_object')}
+                            className="w-full h-20 bg-white text-black rounded-[28px] font-black uppercase tracking-[0.4em] text-[10px] shadow-2xl active:scale-95 transition-all"
+                          >
+                             Initialize Source Scan
+                          </button>
+                          <p className="mt-5 text-[9px] font-black uppercase tracking-widest text-white/40 leading-relaxed">Ensure lighting is uniform.<br/>Center dish in spatial grid.</p>
+                       </div>
+                    </motion.div>
+                  )}
+
+                  {step === 'capture_object' && (
+                    <motion.div key="obj" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-72 h-72 relative flex items-center justify-center border-2 border-white/10 rounded-[40px]">
+                       {/* 3D Wireframe Mesh Simulation */}
+                       <div className="absolute inset-x-8 inset-y-12 border border-white/20 group">
+                          <div className="absolute inset-0 bg-white/10" style={{ height: `${progress}%`, transition: 'height 0.1s linear' }} />
+                          <motion.div 
+                            animate={{ top: ['0%', '100%'] }} 
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-x-0 h-[1.5px] bg-white shadow-[0_0_15px_white]" 
+                          />
+                          {/* Markers */}
+                          <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-white" />
+                          <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-white" />
+                          <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-white" />
+                          <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-white" />
+                       </div>
+                       
+                       <div className="absolute -bottom-36 text-center w-80">
+                          <h3 className="text-xl font-bold uppercase tracking-[0.2em] text-white">Compiling Vertices</h3>
+                          <div className="w-full h-1 bg-white/10 mt-4 rounded-full overflow-hidden">
+                             <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} className="h-full bg-white shadow-[0_0_10px_white]" />
+                          </div>
+                          <p className="text-[10px] uppercase font-black tracking-[0.4em] text-white/30 mt-4 animate-pulse italic">Orbiting Target Artifact...</p>
+                       </div>
+                    </motion.div>
+                  )}
+
+                  {step === 'capture_env' && (
+                    <motion.div key="env" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 overflow-hidden">
+                       <div className="absolute inset-0 grid grid-cols-5 grid-rows-5 gap-3 p-12 opacity-40">
+                          {[...Array(25)].map((_, i) => (
+                            <motion.div 
+                               key={i} 
+                               animate={{ opacity: [0.1, 0.4, 0.1], scale: [0.98, 1, 0.98] }} 
+                               transition={{ duration: 3, delay: i * 0.05, repeat: Infinity }}
+                               className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl" 
+                            />
+                          ))}
+                       </div>
+                       <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <div className="w-[1px] h-48 bg-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.8)] animate-pulse" />
+                          <div className="mt-12 text-center max-w-sm">
+                             <h3 className="text-emerald-500 text-2xl font-black uppercase tracking-[0.3em]">AI Environment Sweep</h3>
+                             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500/40 mt-3 leading-loose">Analyzing Global Illumination Matrix...<br/>Lux Level: 1450CD // Optimal</p>
+                          </div>
+                       </div>
+                    </motion.div>
+                  )}
+
+                  {step === 'processing' && (
+                    <motion.div key="final" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+                       <div className="w-48 h-48 relative mb-12 mx-auto">
+                          <motion.div 
+                            animate={{ rotate: 360, scale: [1, 1.05, 1] }} 
+                            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-0 border-[3px] border-white/5 border-t-white rounded-[48px] shadow-[0_0_50px_rgba(255,255,255,0.05)]" 
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                             <Sparkles className="text-white" size={44} />
+                          </div>
+                       </div>
+                       <h3 className="text-3xl font-black uppercase tracking-tighter text-white mb-4">Materializing Spatial Asset</h3>
+                       <div className="w-72 h-1 bg-white/5 rounded-full overflow-hidden mx-auto border border-white/5">
+                          <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} className="h-full bg-white shadow-[0_0_20px_white]" />
+                       </div>
+                       <p className="mt-8 text-[10px] font-black uppercase tracking-[0.5em] text-white/30">Binary Mesh Inversion {progress}%</p>
+                    </motion.div>
+                  )}
+               </AnimatePresence>
             </div>
+
+            {/* Bottom HUD Telemetry */}
+            <div className="h-24 border-t border-white/5 flex items-center justify-between pointer-events-auto">
+               <div className="flex gap-12">
+                  <div className="flex flex-col">
+                     <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/30">Task</span>
+                     <span className="text-[12px] font-bold uppercase tracking-tighter text-white/90">{scanStatus}</span>
+                  </div>
+                  <div className="flex flex-col">
+                     <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/30">Geometry</span>
+                     <span className="text-[12px] font-bold uppercase tracking-tighter text-white/90">{Math.floor(progress * 13.2)}K Polys</span>
+                  </div>
+               </div>
+               <div className="flex flex-col text-right">
+                  <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/30">Optimization</span>
+                  <span className="text-[12px] font-black uppercase tracking-widest text-emerald-500">Tier: Elite</span>
+               </div>
+            </div>
+
          </div>
       </div>
-
     </motion.div>
   );
 }
