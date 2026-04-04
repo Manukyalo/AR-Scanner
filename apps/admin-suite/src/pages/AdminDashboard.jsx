@@ -52,7 +52,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const restaurantId = 'pronto-restaurant'; 
+  const restaurantId = 'test-restaurant'; 
 
   useEffect(() => {
     if (!auth.currentUser) return;
