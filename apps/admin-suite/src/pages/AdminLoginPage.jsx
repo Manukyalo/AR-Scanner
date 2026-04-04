@@ -19,7 +19,7 @@ export default function AdminLoginPage() {
     
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/admin/dashboard');
+      navigate('/dashboard');
     } catch (err) {
       console.error(err);
       setError('Invalid credentials. Please verify your access key.');
