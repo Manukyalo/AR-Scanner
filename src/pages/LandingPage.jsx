@@ -42,10 +42,10 @@ export default function LandingPage() {
       >
         {/* Hero Icon */}
         <motion.div variants={itemVariants} className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-tr from-brand-primary to-brand-secondary rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
-          <div className="relative w-28 h-28 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden">
-             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-             <ScanFace size={52} className="text-white/90 drop-shadow-lg" strokeWidth={1.5} />
+          <div className="absolute inset-0 bg-gradient-to-tr from-brand-primary/20 to-brand-secondary/20 rounded-3xl blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="relative w-32 h-32 bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-[40px] flex items-center justify-center shadow-2xl overflow-hidden group-hover:border-purple-500/50 transition-colors duration-500">
+             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+             <img src="/logo.png" alt="AR Scanner Logo" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]" />
           </div>
         </motion.div>
 
