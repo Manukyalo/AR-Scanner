@@ -34,8 +34,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@shared': path.resolve(__dirname, '../../shared'),
-      'three': path.resolve(__dirname, '../../src/three-shim.js') // Temporary fallback until shim is moved
+      '@shared': path.resolve(__dirname, '../../shared')
     }
   }
 });
