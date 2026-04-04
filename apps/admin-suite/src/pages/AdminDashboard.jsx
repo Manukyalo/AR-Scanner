@@ -288,16 +288,19 @@ function VisionScanner({ onClose, onCaptured }) {
                 clearInterval(timer);
                 setTimeout(() => { 
                    onCaptured({ 
-                      name: 'Scanned Artifact', 
+                      name: 'Spatial Asset ' + Math.floor(Math.random() * 1000), 
                       category: 'Mains',
+                      description: 'High-fidelity spatial reconstruction generated via Vision Scanner.',
                       price: 2500,
                       modelUrl: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
-                      thumbnailUrl: 'https://modelviewer.dev/shared-assets/models/Astronaut.png'
+                      thumbnailUrl: 'https://modelviewer.dev/shared-assets/models/Astronaut.png',
+                      active: true,
+                      ingredients: ['Scanned Component A', 'Scanned Component B']
                    }); 
                 }, 1500);
                 return 100;
              }
-             return p + 1.8;
+             return p + 2.5;
           });
        }, 50);
        return () => clearInterval(timer);
@@ -704,6 +707,21 @@ function DishModal({ dish, restaurantId, onClose, setUploadProgress, uploadProgr
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Sync formData when dish prop changes (essential for scanned data injection)
+  useEffect(() => {
+    if (dish) {
+      setFormData({
+        name: dish.name || '',
+        description: dish.description || '',
+        price: dish.price || 0,
+        category: dish.category || 'Mains',
+        active: dish.active !== undefined ? dish.active : true,
+        thumbnailUrl: dish.thumbnailUrl || '',
+        modelUrl: dish.modelUrl || ''
+      });
+    }
+  }, [dish]);
+
   const handleFileUpload = async (file, field) => {
     if (!file) return;
     setIsSubmitting(true);
@@ -725,10 +743,24 @@ function DishModal({ dish, restaurantId, onClose, setUploadProgress, uploadProgr
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      if (dish?.id) await updateDoc(doc(db, `restaurants/${restaurantId}/dishes`, dish.id), formData);
-      else await addDoc(collection(db, `restaurants/${restaurantId}/dishes`), formData);
+      const dataToSave = {
+        ...formData,
+        updatedAt: new Date().toISOString(),
+        ...(dish?.id ? {} : { createdAt: new Date().toISOString() })
+      };
+
+      if (dish?.id) {
+        await updateDoc(doc(db, `restaurants/${restaurantId}/dishes`, dish.id), dataToSave);
+      } else {
+        await addDoc(collection(db, `restaurants/${restaurantId}/dishes`), dataToSave);
+      }
       onClose();
-    } catch (err) { alert('Commit failure'); } finally { setIsSubmitting(false); }
+    } catch (err) { 
+      console.error('Commit Error:', err);
+      alert(`Commit failure: ${err.message || 'Unknown protocol error'}`); 
+    } finally { 
+      setIsSubmitting(false); 
+    }
   };
 
   return (

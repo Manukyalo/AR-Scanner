@@ -36,6 +36,18 @@ export default function ARViewPage() {
     fetchDish();
   }, [restaurantId, dishId]);
 
+  // Loading Fallback: Guarantee progress if server doesn't provide content-length
+  useEffect(() => {
+    if (isLoading || modelLoaded) return;
+    const interval = setInterval(() => {
+       setProgress(p => {
+          if (p >= 90) return 90; // Stay at 90% until onLoad
+          return p + 1;
+       });
+    }, 200);
+    return () => clearInterval(interval);
+  }, [isLoading, modelLoaded]);
+
   if (isLoading) return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-8 text-center">
        <div className="w-24 h-24 border-2 border-white/5 border-t-white rounded-full animate-spin mb-8" />
@@ -63,8 +75,14 @@ export default function ARViewPage() {
           exposure="1.2"
           environment-image="neutral"
           interaction-prompt="auto"
-          onProgress={(e) => setProgress(Math.floor(e.detail.totalProgress * 100))}
-          onLoad={() => setModelLoaded(true)}
+          onProgress={(e) => {
+             const p = Math.floor(e.detail.totalProgress * 100);
+             if (p > progress) setProgress(p);
+          }}
+          onLoad={() => {
+             setProgress(100);
+             setModelLoaded(true);
+          }}
           style={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}
           className="absolute inset-0 z-0"
         >
